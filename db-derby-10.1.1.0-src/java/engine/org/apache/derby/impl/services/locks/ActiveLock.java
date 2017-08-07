@@ -42,7 +42,7 @@ public final class ActiveLock extends Lock {
 		Set to true if the object waiting on this thread should wake up,
 		MT - mutable - java synchronized(this)
 		
-		»½ĞÑ±ê¼Ç
+		å”¤é†’æ ‡è®°
 	*/
 	byte wakeUpNow;
 
@@ -101,15 +101,15 @@ public final class ActiveLock extends Lock {
 		  
 		MT - Single thread required - and assumed to be the thread requesting the lock.
 		
-		µÈ´ıËø±»ÊÚÓè£¬µ±Ëø±»ÊÚÓèÊ±·µ»Ø
+		ç­‰å¾…é”è¢«æˆäºˆï¼Œå½“é”è¢«æˆäºˆæ—¶è¿”å›
 		
-		Ë¯Ãß»½ĞÑ·½°¸È¡¾öÓÚÁ½²¼¶ûwakeupnowºÍpotentiallygranted¡£
+		ç¡çœ å”¤é†’æ–¹æ¡ˆå–å†³äºä¸¤å¸ƒå°”wakeupnowå’Œpotentiallygrantedã€‚
 		
-		MT -µ¥Ïß³ÌÒªÇó-²¢¼ÙÉèÊÇÏß³ÌÇëÇóËø¡£
+		MT -å•çº¿ç¨‹è¦æ±‚-å¹¶å‡è®¾æ˜¯çº¿ç¨‹è¯·æ±‚é”ã€‚
 		
-		@return true if the wait ended early (ie. someone else woke us up). Èç¹ûµÈ´ı½áÊøÔç£¨Èç¹û±ğÈË½ĞĞÑÁËÎÒÃÇ£©£¬·µ»Øtrue¡£
+		@return true if the wait ended early (ie. someone else woke us up). å¦‚æœç­‰å¾…ç»“æŸæ—©ï¼ˆå¦‚æœåˆ«äººå«é†’äº†æˆ‘ä»¬ï¼‰ï¼Œè¿”å›trueã€‚
 
-		@exception StandardException timeout, deadlock or thread interrupted ¡°standardexception³¬Ê±£¬ËÀËø »òÏß³ÌÖĞ¶Ï
+		@exception StandardException timeout, deadlock or thread interrupted â€œstandardexceptionè¶…æ—¶ï¼Œæ­»é” æˆ–çº¿ç¨‹ä¸­æ–­
 	*/
 	protected synchronized byte waitForGrant(int timeout)
 		throws StandardException
@@ -150,4 +150,3 @@ public final class ActiveLock extends Lock {
 		notify();
 	}
 }
-

@@ -1759,7 +1759,7 @@ public abstract class BasePage implements Page, Lockable, Observer, TypedFormat
 	}
 
 	/**
-		Get an exclusive latch on the page, but only if I don't have to wait.
+		Get an exclusive latch on the page, but only if I don't have to wait. 获取一个排他锁
 		<BR>
 		MT - thread safe
 	*/

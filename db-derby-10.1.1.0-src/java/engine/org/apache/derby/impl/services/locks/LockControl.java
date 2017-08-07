@@ -34,7 +34,6 @@ import java.util.ListIterator;
 	A LockControl contains a reference to the item being locked
 	and doubly linked lists for the granted locks and the waiting
 	locks.
-	Ò»¸öËø¿ØÖÆÆ÷°üº¬Ò»¸ö¡¾±»Ëø¶ÔÏó¡¿µÄÒıÓÃ£¬ºÍµÄÊÚÓèËøºÍµÈ´ıËøµÄÒ»¸öË«Á´±í¡£
 	<P>
 	MT - Mutable - Container object : single thread required
 
@@ -54,14 +53,14 @@ public class LockControl implements Control {
 		firstGrant lock is moved into the list. Once a list
 		has been created it is always used.
 		
-		ÕâËø¿ØÖÆÊ¹ÓÃÀÖ¹ÛËø·½°¸¡£
-		µ±Ò»¸ö¶ÔÏóµÄµÚÒ»ËøÊÇÀíËùµ±È»
-		¼òµ¥µØÉèÖÃfirstgrantÎª¶ÔÏó£¬³ı
-		ĞèÒª·ÖÅäÒ»¸öÁĞ±í£¬Èç¹ûÃ»ÓĞÆäËûµÄËøÊÇÀíËùµ±È»µÄ
-		ÔÚµÚÒ»¸öËø±»ÊÍ·Å¡£Èç¹ûµÚ¶ş¸öËø
-		È»ºóÊÇÀíËùµ±È»µÄÁĞ±í·ÖÅäºÍ
-		firstgrantËøÒÆµ½ÁĞ±í¡£Ò»µ©Ò»¸öÁĞ±í
-		ÒÑ´´½¨Ëü×ÜÊÇÓÃ¡£
+		æ­¤é”æ§ä»¶ä½¿ç”¨ä¹è§‚é”å®šæ–¹æ¡ˆã€‚
+		å½“å¯¹è±¡ä¸Šçš„ç¬¬ä¸€ä¸ªé”è¢«æˆäºˆå®ƒæ—¶
+		ç®€å•åœ°è®¾ç½®firstgrantä¸ºå¯¹è±¡ï¼Œé™¤
+		å¦‚æœæ²¡æœ‰å…¶ä»–é”ï¼Œåˆ™éœ€è¦åˆ†é…ä¸€ä¸ªåˆ—è¡¨ã€‚
+		åœ¨ç¬¬ä¸€ä¸ªé”é‡Šæ”¾ä¹‹å‰ã€‚å¦‚æœç¬¬äºŒä¸ªé”
+		æˆäºˆä¸€ä¸ªåˆ—è¡¨ï¼Œç„¶ååˆ†é…
+		firstgranté”ç§»åˆ°åˆ—è¡¨ã€‚ä¸€æ—¦ä¸€ä¸ªåˆ—è¡¨
+		å®ƒæ˜¯è¢«åˆ›é€ å‡ºæ¥çš„ï¼Œå®ƒæ€»æ˜¯è¢«ä½¿ç”¨ã€‚
 	*/
 	private Lock				firstGrant;
 	private List				granted;
@@ -259,6 +258,8 @@ public class LockControl implements Control {
 
 	/**
 		Add a lock into this control, granted it if possible.
+		
+		æ·»åŠ ä¸€ä¸ªé”åˆ°æ§åˆ¶å™¨ä¸­ï¼Œå°½å¯èƒ½æˆæƒè¿™ä¸ªé”
 
 		This can be entered in several states.
 
@@ -270,6 +271,11 @@ public class LockControl implements Control {
 		    still locked, it's just that the lock has just been released and the first waker has not woken up yet.
 		</OL>
 		This call is never entered when the object is unlocked and there are no waiters.
+		
+		1.pageè¢«é”å®š(æˆæƒé˜Ÿåˆ—éç©º),ä¸”ç­‰å¾…é˜Ÿåˆ—ç©º
+		2.pageè¢«é”å®š,ä¸”ç­‰å¾…é˜Ÿåˆ—ä¸ä¸ºç©º
+		3.pageè¢«é”,ä¸”ç­‰å¾…é˜Ÿåˆ—ä¸ä¸ºç©ºï¼Œç¬¬ä¸€ä¸ªæ½œåœ¨åœ°è¢«æˆæƒ
+		4.pageè¢«è§£é”,ä¸”ç­‰å¾…é˜Ÿåˆ—ä¸ä¸ºç©ºï¼Œé€»è¾‘ä¸Šä»ç„¶è¢«é”å®šï¼Œé”è¢«é‡Šæ”¾ï¼Œä½†ç¬¬ä¸€ä¸ªwakerè¿˜æ²¡æœ‰é†’æ¥ã€‚
 
 	
 		1) The Lockable has just been unlocked, 
@@ -287,6 +293,12 @@ public class LockControl implements Control {
 		// will only grant this lock if we already hold a lock.
 		// This stops a lock being frozen out while compatible locks
 		// jump past it.
+
+		// å¦‚æœæœ‰å…¶ä»–waitersä¸ºè¿™ä¸ªé”ï¼Œç„¶åæˆ‘ä»¬
+		// åªå°†åªæˆæƒè¿™ä¸ªé”ï¼Œå¦‚æœæˆ‘ä»¬å·²ç»æŒæœ‰è¿™ä¸ªé”ã€‚
+		// è¿™é˜»æ­¢äº†é”è¢«å†»ç»“äº†ï¼Œè€Œcompatible locks
+		//å®ƒè·³è¿‡å»ã€‚
+	
 		boolean grantLock = false;		
 		boolean otherWaiters = (firstWaiter() != null);
 
@@ -304,13 +316,14 @@ public class LockControl implements Control {
 
 			boolean selfCompatible = lref.lockerAlwaysCompatible();
 			
+			// éå†å·²æˆäºˆçš„é”ï¼Œæ£€æŸ¥æ˜¯å¦æ˜¯åŒä¸€ä¸ªrequest,åŒä¸€ä¸ªäº‹åŠ¡
 			int index = 0;
 			int endIndex = firstGrant == null ? granted.size() : 0;
 			do {
 
 				Lock gl = firstGrant == null ? (Lock) granted.get(index) : firstGrant;
 
-
+                // åŒä¸€ä¸ªäº‹åŠ¡
 				boolean sameSpace = (gl.getCompatabilitySpace().equals(compatabilitySpace));
 
 				// if it's one of our locks and we are always compatible with 
@@ -329,6 +342,7 @@ public class LockControl implements Control {
 					continue;
 				}
 				
+				// å‡å¦‚ä¸å…¼å®¹å·²ç»æˆäºˆçš„é”ï¼Œé‚£ä¹ˆæˆ‘ä»¬ä¸èƒ½è¢«æˆäºˆé”ï¼Œåˆ™ç«‹é©¬æ”¾å¼ƒã€‚
 				// If we are not compatible with some already granted lock
                 // then we can't be granted, give up right away.
 				if (!lref.requestCompatible(qualifier, gl.getQualifier())) {
@@ -370,6 +384,7 @@ public class LockControl implements Control {
 			return lockItem;
 		}
 		
+		// æ·»åŠ ç­‰å¾…é”åˆ° ç­‰å¾…é˜Ÿåˆ—
 		ActiveLock waitingLock = new ActiveLock(compatabilitySpace, lref, qualifier);
 
 		// If the object is already locked by this compatability space

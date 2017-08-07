@@ -40,7 +40,10 @@ import java.util.Enumeration;
 /**
 	A LockSet is a complete lock table.	A lock table is a hash table
 	keyed by a Lockable and with a LockControl as the data element.
-
+    
+    KEY: Lockable
+    VALUE:LockControl
+    
 	<P>
 	A LockControl contains information about the locks held on a Lockable.
 
@@ -110,9 +113,9 @@ public final class LockSet extends Hashtable
 	/**
 	 *	Lock an object within a specific compatibility space.
 	 *
-	 *	@param	compatabilitySpace Compatibility space. ÊÂÎñ
-	 *	@param	ref Lockable reference. Page¶ÔÏó(×ÊÔ´)
-	 *	@param	qualifier Qualifier.   ÉêÇëËø¶ÔÏó(ÉêÇëÈË)
+	 *	@param	compatabilitySpace Compatibility space. äº‹åŠ¡
+	 *	@param	ref Lockable reference. Pageå¯¹è±¡(èµ„æº)
+	 *	@param	qualifier Qualifier.   ç”³è¯·é”å¯¹è±¡(ç”³è¯·äºº)
 	 *	@param	timeout Timeout in milli-seconds
 	 *
 	 *	@return	Object that represents the lock.
@@ -139,7 +142,7 @@ public final class LockSet extends Hashtable
 
 		synchronized (this) {
             
-			// ×ÊÔ´Èç¹ûÃ»ÓĞ±»Ëø¶¨£¬Ö±½Ó·µ»Ø
+			// èµ„æºå¦‚æœæ²¡æœ‰è¢«é”å®šï¼Œç›´æ¥è¿”å›
 			gc = getControl(ref);
 
 			if (gc == null) {
@@ -149,12 +152,13 @@ public final class LockSet extends Hashtable
 
 				gl.grant();
                 
-				// ½«×ÊÔ´ÓëËø·ÅÈëËø³ØÖĞ
+				// å°†èµ„æºä¸é”æ”¾å…¥é”æ± ä¸­
 				put(ref, gl);
 
 				return gl;
 			}
-
+           
+			// è·å–é”ä¸Šçš„æ§åˆ¶å™¨
 			control = gc.getLockControl();
 			if (control != gc) {
 				put(ref, control);
@@ -172,13 +176,16 @@ public final class LockSet extends Hashtable
                         getControl(control.getLockable()) + " " + control);
                 }
 			}
-
+            
+			// åŠ é”æ“ä½œ
 			lockItem = control.addLock(this, compatabilitySpace, qualifier);
-
+            
+			// å‡å¦‚é”çš„ä¸ªæ•°ä¸ç­‰äº0è¿”å› ?
 			if (lockItem.getCount() != 0) {
 				return lockItem;
 			}
-
+            
+			// ä¸ç­‰å¾…é”ç­–ç•¥
 			if (timeout == C_LockFactory.NO_WAIT) {
 
     			// remove all trace of lock
@@ -212,6 +219,7 @@ public final class LockSet extends Hashtable
 
 		} // synchronized block
 
+		// æ ¹æ®é”çš„ç­–ç•¥ï¼Œè¿›è¡Œwaitæ“ä½œ
 		boolean deadlockWait = false;
 		int actualTimeout;
 
@@ -274,6 +282,7 @@ public final class LockSet extends Hashtable
 			long startWaitTime = 0;
 
 		try {
+			// æ— é™å¾ªç¯ï¼Œè·å–é”
 forever:	for (;;) {
 
 
