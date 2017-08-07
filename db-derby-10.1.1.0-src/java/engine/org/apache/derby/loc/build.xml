@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+
+<project default="locales" basedir="../../../../../..">
+
+<!-- Set Properties -->
+  <!-- User settings -->
+  <property file="${user.home}/ant.properties"/>
+  <!-- Set property dir -->
+  <property name="properties.dir" value="tools/ant/properties"/>
+  <!-- Significant dirs -->
+  <property file="${properties.dir}/dirs.properties"/>
+  <!-- Product names and release info -->
+  <property file="${properties.dir}/release.properties"/>
+
+<!-- Targets -->
+  <target name="locales" depends="split"/>
+
+  <target name="split" depends="verifysplit">
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_en"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_de_DE"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_es"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_ja_JP"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_ko_KR"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_qq_PP_testOnly"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_pt_BR"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_zh_CN"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_zh_TW"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_it"/>
+    </antcall>
+    <antcall target="doSplit">
+      <param name="msgdir" value="${derby.locales.dir}"/>
+      <param name="msgfile" value="messages_fr"/>
+    </antcall>
+  </target>
+
+  <target name="doSplit" depends="splitprops,verifysplit,noSplit,chksplit" unless="split.done">
+<!-- SplitMessages doesn't play well with jdk13 (resource-bundle stuff??) -->
+    <mkdir dir="${loc.dir}"/>
+    <java classname="org.apache.derbyBuild.splitmessages"
+          classpath="${out.dir}"
+          dir="${derby.locales.dir}"
+          fork="yes"
+          failonerror="true">
+      <arg value="${loc.dir}"/> 
+      <arg value="${split.properties}"/>
+    </java>
+    <touch file="${split.donefile}"/>
+  </target>
+
+  <target name="splitprops">
+    <property name="split.properties" value="${msgdir}/${msgfile}.properties"/>
+    <property name="split.donefile" value="${loc.dir}/${msgfile}.done"/>
+  </target>
+
+  <target name="chksplit">
+    <uptodate property="split.done"
+              targetfile="${split.donefile}" >
+      <srcfiles dir="${derby.locales.dir}" includes="${msgfile}.properties" />
+    </uptodate>
+  </target>
+
+  <target name="verifysplit">
+    <available classname="org.apache.derbyBuild.splitmessages"
+               property="splitmsgs.available">
+      <classpath>
+        <pathelement path="${out.dir}"/>
+      </classpath>
+    </available>
+  </target>
+
+  <target name="noSplit" unless="splitmsgs.available">
+    <echo message=""/>
+    <echo message="***** SplitMessages not available *****"/>
+    <echo message=" ***** Run &quot;all&quot; target first *****"/>
+    <echo message=""/>
+    <fail message="  Exiting ant build..."/>
+  </target>
+</project>
+
